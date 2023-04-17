@@ -1,0 +1,19 @@
+FROM alpine:latest
+
+# Install deps
+RUN apk update && apk upgrade
+RUN apk add --no-cache git build-base linux-headers cmake libbsd-dev py3-pip patchelf fuse-dev
+
+# Fetch source
+RUN git clone https://github.com/ruanformigoni/unionfs-fuse
+WORKDIR unionfs-fuse
+
+# Compile
+RUN cmake -H. -DWITH_LIBFUSE3=FALSE -DWITH_XATTR=FALSE -Bbuild
+RUN cmake --build build
+
+# Create static binary
+RUN pip3 install wheel scons
+RUN pip3 install staticx
+RUN mkdir -p dist
+RUN staticx build/src/unionfs dist/unionfs
