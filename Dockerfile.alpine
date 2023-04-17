@@ -1,0 +1,19 @@
+FROM alpine:latest
+
+# Install deps
+RUN apk update && apk upgrade
+RUN apk add --no-cache git build-base linux-headers cmake libbsd-dev fuse-dev \
+  fuse3-dev fuse3-static
+
+# Fetch source
+RUN git clone https://github.com/ruanformigoni/unionfs-fuse-static-musl
+ENV LD_FLAGS="-static"
+WORKDIR unionfs-fuse-static-musl
+
+# # Compile
+RUN cmake -H. -DWITH_LIBFUSE3=TRUE -DWITH_XATTR=TRUE -Bbuild
+RUN cmake --build build
+
+# Create static binary
+RUN mkdir -p /dist
+RUN cp build/src/unionfs /dist/unionfs
