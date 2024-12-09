@@ -14,6 +14,9 @@ WORKDIR unionfs-fuse-static-musl
 RUN cmake -H. -DWITH_LIBFUSE3=TRUE -DWITH_XATTR=TRUE -Bbuild
 RUN cmake --build build
 
+# Strip
+RUN strip -s -R .comment -R .gnu.version --strip-unneeded build/src/unionfs
+
 # Create static binary
 RUN mkdir -p /dist
 RUN cp build/src/unionfs /dist/unionfs
